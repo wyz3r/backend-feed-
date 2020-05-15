@@ -1,0 +1,17 @@
+version: '3'
+services:
+  cassandradb:
+    image: cassandra:2.2
+    volumes:
+     - ./dbcassandra:/db
+     - ./cassloader:/cassloader
+    ports:
+      - "9042:9042"
+      - "9160:9160"
+  cassloader:
+    image: cassandra:2.2
+    volumes:
+    - ./cassloader:/cassloader
+    command: /cassloader/init.sh
+    depends_on:
+    - cassandradb

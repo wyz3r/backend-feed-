@@ -1,0 +1,37 @@
+# GitLab CI Docker Image
+image: docker:latest
+
+variables:
+  DOCKER_DRIVER: overlay
+  REGISTRYURL: git.socialdecode.com:4567/delariva/advanced-feed:latest
+
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN git.socialdecode.com:4567
+
+build:
+  only:
+    - master
+  stage: build
+  tags:
+    - internal
+  script:
+  - docker build -t $REGISTRYURL .
+  - docker push $REGISTRYURL
+
+deloyealo:
+  only:
+    - master
+  stage: deploy
+  before_script:
+    - echo "releasing $REGISTRYURL..."
+  stage: deploy
+  image: cdrx/rancher-gitlab-deploy
+  tags:
+    - internal
+  script:
+    - upgrade --stack buzzfeed --service buzzback
+
+stages:
+  - build
+  - deploy
+
